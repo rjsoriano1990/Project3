@@ -1,12 +1,12 @@
-CREATE TABLE us_gas_price_region(
-id SERIAL PRIMARY KEY,
-date DATE,
-east_coast NUMERIC,
-new_england NUMERIC,
-central_atlantic NUMERIC,
-lower_atlantic NUMERIC,
-midwest NUMERIC,
-gulf_coast NUMERIC,
-rocky_mountains NUMERIC,
-west_coast NUMERIC
+CREATE TABLE "us_gas_prices_region" (
+    "ID" SERIAL PRIMARY KEY,
+    "date" date   NOT NULL,
+    "east_coast" float   NOT NULL,
+    "new_england" float   NOT NULL,
+    "central_atlantic" float   NOT NULL,
+    "lower_atlantic" float   NOT NULL,
+    "midwest" float   NOT NULL,
+    "gulf_coast" float   NOT NULL,
+    "rocky_mountains" float   NOT NULL,
+    "west_coast" float   NOT NULL
 );
