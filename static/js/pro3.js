@@ -1,62 +1,52 @@
-function createMap(states) {
 
-    // Create the tile layer that will be the background of our map.
-    var USmap = L.tileLayer('https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Petroleum_Administration_for_Defense_Districts.svg/1200px-Petroleum_Administration_for_Defense_Districts.svg.png', {
 
-        attribution: '&copy; <a href="https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FPetroleum_Administration_for_Defense_Districts&psig=AOvVaw3Yjxbr2JsTXr5h8STKq2gr&ust=1638422846536000&source=images&cd=vfe&ved=0CAwQjhxqFwoTCMjv3KLvwfQCFQAAAAAdAAAAABAD">OpenStreetMap</a> contributors'
-    });
+var dropdownMenu = d3.select("#Dates");
+var date = dropdownMenu.property("value");
 
 
 
-  
-  
-    // Create a baseMaps object to hold the streetmap layer.
-    var baseMaps = {
-      "US Map": USmapLayer
-    };
-  
-    // Create an overlayMaps object to hold the bikeStations layer.
-    var StateOverLayMaps = {
-      "US States": states
-    };
-  
-    // Create the map object with options.
-    var map = L.map("map-id", {
-      center: [37.0902, -95.7129],
-      zoom: 12,
-      layers: [USmap, states]
-    }); 
-    // Create a layer control, and pass it baseMaps and overlayMaps. Add the layer control to the map.
-    L.control.layers(baseMaps, StateOverLayMaps, {
-      collapsed: false
-    }).addTo(map);
+
+d3.json(`/gas1/${date}`).then(data=>{
+    console.log(data)
+});
+
+function DateChanged2(date)  {
+
+d3.json(`/gas1/${date}`).then(data=>{
+  console.log(data)
+});
+}
+
+
+function DateChanged(date)  {
+
+  d3.json(`/gas1/${date}`).then(data=>{
+    console.log(data)
+  })
   }
-  
-  function createMarkers(response) {
-  
-    // Pull the "stations" property from response.data.
-    var states = response.data.states;
-  
-    // Initialize an array to hold state markers.
-    var stateMarkers = [];
-  
-    // Loop through the states array.
-    for (var index = 0; index < states.length; index++) {
-      var state = states[index];
-  
-      // For each station, create a marker, and bind a popup with the state's name.
-      var stateMarker = L.marker([state.lat, state.lon])
-        .bindPopup("<h3>" + state.name + "<h3><h3>'us_gas_price_region': " + state.price + "</h3>");
-  
-      // Add the marker to the bikeMarkers array.
-      stateMarkers.push(stateMarker);
-    }
-  
-    // Create a layer group that's made from the state markers array, and pass it to the createMap function.
-    createMap(L.layerGroup(stateMarkers));
+
+// dropdown for regions
+var dropdownMenu = d3.select("#Region");
+var region = dropdownMenu.property("value");
+    
+    
+    
+    
+  d3.json(`/gas2/${region}`).then(data=>{
+      console.log(data)
+  })
+    
+function DateChanged2(region)  {
+    
+  d3.json(`/gas2/${region}`).then(data=>{
+      console.log(data)
+  })
   }
-  
-  
-  // Perform an API call to the Citi Bike API to get the state information. Call createMarkers when it completes.
-  d3.json("https://gbfs.citibikenyc.com/gbfs/en/station_information.json").then(createMarkers);
-  
+    
+    
+function DateChanged(date)  {
+    
+  d3.json(`/gas2/${date}`).then(data=>{
+      console.log(data)
+  })
+  };

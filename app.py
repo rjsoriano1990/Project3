@@ -3,169 +3,276 @@ from sqlalchemy import create_engine
 from config import post_pass
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.sql.expression import and_
 
 # create and modify the flask app
 app = Flask(__name__)
 
 # engine and connect to sql DB
-connection_string = f"postgres:{post_pass}@localhost:5432/Project2"
+connection_string = f"postgres:{post_pass}@localhost:5432/Project3"
 engine = create_engine(f'postgresql://{connection_string}')
 
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 
 
-# us_gas_price_region
-# us_gas_price_region
-# us_gas_price_region
-# us_gas_price_region
-# 
-#  date DATE,
-
-east_coast = Base.classes.east_coast
-new_england = Base.classes.new_england
-lower_atlantic = Base.classes.lower_atlantic
-midwest = Base.classes.midwest
-gulf_coast= Base.classes.gulf_coast
-rock_mountains = Base.classes.rocky_mountains
-west_coast = Base.classes.west_coast
-
-
-
-
 # save references to table 
 #set table variable
-covid_case_death = Base.classes.covid_case_death
-covid_vac = Base.classes.covid_vac
-us_unemployment = Base.classes.us_unemployment
-state_population = Base.classes.state_population
+us_gas_prices_region = Base.classes.us_gas_prices_region
 
 # opening standard route
 @app.route('/')
 def home():
-    with open ('templates/index.html') as f:
+    with open ('templates/project3.html') as f:
         return f.read()
 
-@app.route('/cov1/<date>')
+@app.route('/gas1/<date>')
 def date_func(date):
 
     # map
     session = Session(engine)
-    results = session.query(covid_case_death.submission_date, covid_case_death.state, covid_case_death.tot_cases, covid_case_death.tot_death, covid_vac.series_complete_pop_pct, state_population.population, us_unemployment.unemployment_rate)\
-    .outerjoin(covid_vac, covid_case_death.submission_date == covid_vac.submission_date)\
-    .outerjoin(state_population, covid_case_death.state == state_population.state)\
-    .outerjoin(us_unemployment, and_(covid_case_death.submission_date == us_unemployment.submission_date, covid_case_death.state == us_unemployment.state))\
-    .filter(covid_case_death.submission_date == date).order_by(covid_case_death.submission_date).all()
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.date == date).all()
     session.close()
 
+
+
     map = []
-    for submission_date, state, tot_cases, tot_death, series_complete_pop_pct, population, unemployment_rate in results:
+    for date,  east_coast, new_england, central_atlantic, lower_atlantic, midwest, gulf_coast, rocky_mountains, west_coast in results:
         results_dic = {}
-        results_dic['submission_date'] = submission_date
-        results_dic['state'] = state
-        results_dic['tot_cases'] = tot_cases
-        results_dic['tot_death'] = tot_death
-        results_dic['cases_per_100'] = round((tot_cases / population) * 100, 2)
-        results_dic['deaths_per_100'] = round((tot_death / population) * 100, 2)
-        results_dic['series_complete_pop_pct'] = series_complete_pop_pct
-        results_dic['population'] = population
-        results_dic['unemployment_rate'] = unemployment_rate
+        results_dic['date'] = date
+        results_dic[ "east_coast"] =  east_coast
+        results_dic["new_england"] = new_england
+        results_dic['central_atlantic'] = central_atlantic
+        results_dic['lower_atlantic'] = lower_atlantic
+        results_dic['midwest'] = midwest
+        results_dic['gulf_coast'] = gulf_coast
+        results_dic['rocky_mountains'] = rocky_mountains
+        results_dic['west_coast'] = west_coast
             
         map.append(results_dic)
         
     #results
     return jsonify(map)
 
-# routes that will be fetched with arguements end points
-@app.route('/cov/<state>')
-def state_func(state):
+####
 
-    # vis_3
+@app.route('/gas2/<east_coast>')
+def east_coast_func(east_coast):
+
+    # map
     session = Session(engine)
-    results = session.query(covid_case_death.submission_date, covid_case_death.state, covid_case_death.tot_cases, covid_case_death.tot_death, state_population.population).filter(covid_case_death.state == state_population.state, covid_case_death.state == state).order_by(covid_case_death.submission_date).all()
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.east_coast == east_coast).all()
     session.close()
 
-    #format data
-    vis_3 = []
-    for submission_date, state, tot_cases, tot_death, population in results:
+    viz_1 = []
+    for date, east_coast in results:
         results_dic = {}
-        results_dic['submission_date'] = str(submission_date)
-        results_dic['state'] = state
-        results_dic['tot_cases'] = tot_cases
-        results_dic['tot_death'] = tot_death
-        
-        vis_3.append(results_dic)
+        results_dic['date'] = date
+        results_dic['east_coast'] = east_coast
+        viz_1.append(results_dic)
+    return jsonify(viz_1 )
+
+####
+
+@app.route('/gas2/<new_england>')
+def new_england_func(new_england):
+
+    # map
+    session = Session(engine)
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.new_england == new_england).all()
+    session.close()
+
+    viz_2 = []
+    for date, new_england in results:
+        results_dic = {}
+        results_dic['date'] = date
+        results_dic['new_england'] = new_england
+        viz_2.append(results_dic)
+        return jsonify(viz_2)
+
+####
+
+@app.route('/gas2/< central_atlantic>')
+def  central_atlantic_func( central_atlantic):
+
+    # map
+    session = Session(engine)
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.central_atlantic==  central_atlantic).all()
+    session.close()
+    viz_3 = []
+    for date, central_atlantic in results:
+        results_dic = {}
+        results_dic['date'] = date
+        results_dic['central_atlantic'] = central_atlantic
+        viz_3.append(results_dic)
+        return jsonify(viz_3) 
+
+
+####
+
+@app.route('/gas2/<lower_atlantic>')
+def  lower_atlantic_func(lower_atlantic):
+
+    # map
+    session = Session(engine)
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.lower_atlantic ==  lower_atlantic).all()
+    session.close()
+    viz_4 = []
+    for date, lower_atlantic in results:
+        results_dic = {}
+        results_dic['date'] = date
+        results_dic['lower_atlantic'] = lower_atlantic
+        viz_4.append(results_dic)
+        return jsonify(viz_4)
+
+#####
+
+@app.route('/gas2/<midwest>')
+def  midwest_func(midwest):
+
+    # map
+    session = Session(engine)
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.midwest ==  midwest).all()
+    session.close()
+
+    viz_5 = []
+    for date, midwest in results:
+        results_dic = {}
+        results_dic['date'] = date
+        results_dic['midwest'] = midwest
+        viz_5.append(results_dic)
+        return jsonify(viz_5) 
+
+#####
+
+
+
+@app.route('/gas2/<gulf_coast>')
+def  gulf_coast_func(gulf_coast):
+
+    # map
+    session = Session(engine)
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.gulf_coast ==  gulf_coast).all()
+    session.close()
+
+    viz_6 = []
+    for date, gulf_coast in results:
+        results_dic = {}
+        results_dic['date'] = date
+        results_dic['gulf_coast'] = gulf_coast
+        viz_6.append(results_dic)
+        return jsonify(viz_6)
+
+
+######
+
+@app.route('/gas2/<rocky_mountains>')
+def  rocky_mountains_func(rocky_mountains):
+
+    # map
+    session = Session(engine)
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.rocky_mountains ==  rocky_mountains).all()
+    session.close()
+
+    viz_7 = []
+    for date, rocky_mountains in results:
+        results_dic = {}
+        results_dic['date'] = date
+        results_dic['rocky_mountains'] = rocky_mountains
+        viz_7.append(results_dic)
+        return jsonify(viz_7)
+
+
+
+
+@app.route('/gas2/<west_coast>')
+def  west_coast_func(rocky_mountains):
+
+    # map
+    session = Session(engine)
+    results = session.query(us_gas_prices_region.date, us_gas_prices_region.east_coast, us_gas_prices_region.new_england, 
+                            us_gas_prices_region.central_atlantic, us_gas_prices_region.lower_atlantic, us_gas_prices_region.midwest,
+                            us_gas_prices_region.gulf_coast, us_gas_prices_region.rocky_mountains, us_gas_prices_region.west_coast).filter(us_gas_prices_region.rocky_mountains ==  rocky_mountains).all()
+    session.close()
+    viz_8 = []
+    for date, rocky_mountains in results:
+        results_dic = {}
+        results_dic['date'] = date
+        results_dic['rocky_mountains'] = rocky_mountains
+        viz_8.append(results_dic)
+        return jsonify(viz_8)
+       
     
-    # vis_2
-    session = Session(engine)
-    results = session.query(covid_case_death.submission_date, covid_case_death.state, covid_case_death.tot_cases, covid_case_death.tot_death).filter(covid_case_death.state == state_population.state, covid_case_death.state == state).order_by(covid_case_death.submission_date).all()
-    session.close()
-
-    #format data
-    vis_2 = []
-    for submission_date, state, tot_cases, tot_death in results:
-        results_dic = {}
-        results_dic['submission_date'] = str(submission_date)
-        results_dic['state'] = state
-        results_dic['cases_per_100'] = round((tot_cases / population) * 100, 2)
-        results_dic['deaths_per_100'] = round((tot_death / population) * 100, 2)
-        
-        vis_2.append(results_dic)
-
-    #vis 4
-    session = Session(engine)
-    results = session.query(covid_vac.submission_date, covid_vac.state, covid_vac.series_complete_pop_pct).filter(covid_vac.state == state).order_by(covid_vac.submission_date).all()
-    session.close()
-
-    #format data
-    vis_4 = []
-    for submission_date, state, series_complete_pop_pct in results:
-        results_dic = {}
-        results_dic['submission_date'] = str(submission_date)
-        results_dic['state'] = state
-        results_dic['series_complete_pop_pct'] = series_complete_pop_pct
-        vis_4.append(results_dic)
-        
-
-    #Vis 5
-    session = Session(engine)
-    results = session.query(us_unemployment.submission_date, us_unemployment.state, us_unemployment.unemployment_rate).filter(us_unemployment.state == state).order_by(us_unemployment.submission_date).all()
-    session.close()
-
-    #format data
-    vis_5 = []
-    for submission_date, state, unemployment_rate in results:
-        results_dic = {}
-        results_dic['submission_date'] = str(submission_date)
-        results_dic['state'] = state
-        results_dic['unemployment_rate'] = unemployment_rate
-        vis_5.append(results_dic)
     
-    #vis 6
-    session = Session(engine)
-    results = session.query(covid_vac.submission_date, covid_vac.state, covid_vac.series_complete_janssen, covid_vac.series_complete_moderna, covid_vac.series_complete_pfizer).filter(covid_vac.state == state, covid_vac.submission_date == "2021, 10, 1").order_by(covid_vac.submission_date).all()
-    session.close()
+    
+      
+    
+    
+    
+    
 
-    #format data
-    vis_6 = []
-    for submission_date, state, series_complete_janssen, series_complete_moderna, series_complete_pfizer in results:
-        results_dic = {}
-        total = series_complete_janssen + series_complete_moderna + series_complete_pfizer
-        results_dic['submission_date'] = submission_date
-        results_dic['state'] = state
-        results_dic['series_complete_janssen'] = series_complete_janssen
-        results_dic['series_complete_moderna'] = series_complete_moderna
-        results_dic['series_complete_pfizer'] = series_complete_pfizer
-        vis_6.append(results_dic)
 
-    #results
-    return jsonify(vis_2 = vis_2,
-    vis_3 = vis_3,
-    vis_4 = vis_4,
-    vis_5 = vis_5,
-    vis_6 = vis_6)
+
+"""
+const activation_dropdown_id = '#selActivation'
+
+// Attach the on-change-handler for the activation dropdown
+d3.selectAll(activation_dropdown_id).on('change', updatePlot);
+
+function updatePlot() {
+  /*
+   * This function updates the lineplot's data & title
+   * with the values that are currently selected in the
+   * #selActivation dropdown list.
+   */
+
+  // Get the selected dropdown's "value" attribute
+  var activation = d3.select(activation_dropdown_id).property('value');
+  // Get the selected dropdown's inner text. Note we add "option:checked" this time.
+  var name = d3.select(`${activation_dropdown_id} option:checked`).text();
+
+  // Build a href to get the activation data selected
+  var dataUrl = `/data/${activation}?from=-5&to=5`;
+  console.log(dataUrl);
+
+  // Make a query to get the data, then update the graph 
+  // with whatever data get's returned.
+  d3.json(dataUrl).then(data => {
+    let layout = {
+      title: `This is a ${name} activation curve`
+    };
+    
+    Plotly.newPlot("plot", [data], layout);
+  });
+}
+
+// initialize graph
+updatePlot();
+
+
+
+
+
+
+
+    
+"""
 
 # extra ending thingy that I still dont understand 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
